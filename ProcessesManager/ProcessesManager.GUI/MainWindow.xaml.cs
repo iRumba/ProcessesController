@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ProcessManager.Core;
+using ProcessManager.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +25,15 @@ namespace ProcessesManager.GUI
         public MainWindow()
         {
             InitializeComponent();
+            var processManager = new Manager();
+            var processes = new List<Process>
+            {
+                new Process(1,5,7,9),
+                new Process(2,5,7,9),
+                new Process(3,5,7,9),
+                new Process(4,5,7,9),
+            };
+            var res = processManager.Start(processes, 2);
         }
     }
 }

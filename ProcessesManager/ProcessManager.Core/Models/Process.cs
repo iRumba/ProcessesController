@@ -7,14 +7,9 @@ using System.Threading.Tasks;
 
 namespace ProcessManager.Core.Models
 {
-    public class Process //: LockedObject
+    public class Process
     {
         List<ProcessStage> _stages;
-
-        ProcessStatus _status;
-
-        public event Action<Process> ProcessCompleted;
-        public event Action<Process, ProcessStage> ProcessStageCompleted;
 
         public int CurrentStageIndex { get; private set; }
         public ProcessStage CurrentStage
@@ -26,7 +21,7 @@ namespace ProcessManager.Core.Models
                 return _stages[CurrentStageIndex];
             }
         }
-        
+
 
         public string ProcessName { get; set; }
 
@@ -40,20 +35,6 @@ namespace ProcessManager.Core.Models
             }
         }
 
-        public ProcessStatus Status
-        {
-            get
-            {
-                if (Completed)
-                    return ProcessStatus.Completed;
-                return _status;
-            }
-            set
-            {
-                _status = value;
-            }
-        }
-            
 
         public IEnumerable<ProcessStage> Stages
         {
@@ -63,7 +44,7 @@ namespace ProcessManager.Core.Models
             }
         }
 
-        public Process(int cpu1Time, int hdd2Time, int cpu3Time)
+        public Process(int prioritet, int cpu1Time, int hdd2Time, int cpu3Time)
         {
             _stages = new List<ProcessStage>
             {
@@ -71,8 +52,7 @@ namespace ProcessManager.Core.Models
                 new ProcessStage(hdd2Time, ProcessStages.HDD),
                 new ProcessStage(cpu3Time, ProcessStages.CPU),
             };
-
-            //Status = ProcessStatus.Configure;
+            Prioritet = prioritet;
         }
 
         public IEnumerable<ProcessStage> AddStages(int hddTime, int cpuTime)
@@ -95,48 +75,31 @@ namespace ProcessManager.Core.Models
 
         internal ProcessTickResult OnTick()
         {
-            switch (Status)
+            var res = new ProcessTickResult();
+            var stageResult = CurrentStage.OnTick();
+
+            if (stageResult.Completed)
             {
-                case ProcessStatus.Work:
-                    var res = CurrentStage.OnTick();
-                    if (res.Completed)
-                    {
-                        CurrentStageIndex++;
-                    }
-                    break;
+                res.StageCompleted = true;
+                CurrentStageIndex++;
             }
+
             if (Completed)
             {
-                return new ProcessTickResult(true);
+                res.Completed = true;
             }
             else
             {
-                return new ProcessTickResult(false, CurrentStage.LeftTime);
+                res.CurrentStageTimeLeft = CurrentStage.EllapsedTime;
             }
+            return res;
         }
-    }
-
-    public enum ProcessStatus
-    {
-        Work,
-        Wait,
-        Completed,
     }
 
     public class ProcessTickResult
     {
-        public bool Completed { get; }
-        public int CurrentStageTimeLeft { get; }
-
-        public ProcessTickResult(bool completed)
-        {
-            Completed = completed;
-        }
-
-        public ProcessTickResult(bool completed, int currentStageTimeLeft)
-        {
-            Completed = completed;
-            CurrentStageTimeLeft = currentStageTimeLeft;
-        }
+        public bool Completed { get; set; }
+        public int CurrentStageTimeLeft { get; set; }
+        public bool StageCompleted { get; set; }
     }
 }

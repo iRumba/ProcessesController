@@ -18,7 +18,7 @@ namespace ProcessManager.Core.Models
             Time = time;
             WaitingProcesses = waitingProcesses.ToList();
             WorkingProcesses = workingProcesses.ToList();
-            HddProcesses = HddProcesses.ToList();
+            HddProcesses = hddProcesses.ToList();
         }
     }
 }

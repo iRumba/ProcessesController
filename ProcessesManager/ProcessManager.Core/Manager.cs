@@ -1,4 +1,5 @@
-﻿using ProcessManager.Core.Models;
+﻿using ProcessManager.Core.Extensions;
+using ProcessManager.Core.Models;
 using ProcessManager.Core.Primitives;
 using System;
 using System.Collections.Generic;
@@ -8,37 +9,8 @@ using System.Threading.Tasks;
 
 namespace ProcessManager.Core
 {
-    public class ProcessManager //: LockedObject
+    public class Manager
     {
-        List<Process> _processes;
-
-        //public int NumberOfThreads
-        //{
-        //    get
-        //    {
-        //        return (int)GetValue(nameof(NumberOfThreads));
-        //    }
-        //    set
-        //    {
-        //        if (value < 1)
-        //            throw new InvalidOperationException("Количество потоков не должно быть меньше одного");
-        //        SetValue(nameof(NumberOfThreads), value);
-        //    }
-        //}
-
-        public IEnumerable<Process> Processes
-        {
-            get
-            {
-                return _processes.AsReadOnly();
-            }
-        }
-
-        public ProcessManager()
-        {
-            //NumberOfThreads = 2;
-        }
-
         public async Task<Report> StartAsync(IEnumerable<Process> processes, int numberOfThreads)
         {
             return await Task.Run(() => Start(processes, numberOfThreads));
@@ -48,22 +20,18 @@ namespace ProcessManager.Core
         {
             var res = new Report(numberOfThreads);
 
-            foreach(var process in processes)
-            {
-                process.Status = ProcessStatus.Wait;
-            }
-            var uncompletedProcesses = processes.Where(p => !p.Completed);
-            var processesInWork = uncompletedProcesses.Where(p => p.Status == ProcessStatus.Work);
-            var toWorkCandidates = uncompletedProcesses.Where(p=>p.Status == ProcessStatus.Wait);
             var waitings = processes.ToList();
             var allCount = waitings.Count;
             var threads = new Process[numberOfThreads];
             var hdd = new List<Process>();
+            var inWork = hdd.Concat(threads).Where(p => p != null);
             var completed = new List<Process>();
+            var counter = 0;
+            res.AddRow(counter, waitings.ToReport(), threads.ToReport(), hdd.ToReport());
             while (allCount > completed.Count)
             {
                 // Процессы в работе выполняют работу (время текущего состояния уменьшается)
-                foreach (var process in processesInWork)
+                foreach (var process in inWork)
                 {
                     var tickResult = process.OnTick();
                     if (tickResult.Completed)
@@ -71,23 +39,42 @@ namespace ProcessManager.Core
                         RemoveProcessFromthreads(threads, process);
                         completed.Add(process);
                     }
-                        
+                    else if (tickResult.StageCompleted)
+                    {
+                        RemoveProcessFromthreads(threads, process);
+                        var list = process.CurrentStage.Stage == ProcessStages.CPU ? waitings : hdd;
+                        list.Add(process);
+                    }
                 }
 
                 // Затыкаем дыры в работе приоритетными процессами
-                foreach (var process in toWorkCandidates.OrderByDescending(p => p.Prioritet))
+                var toCpu = waitings.Where(p => p.CurrentStage.Stage == ProcessStages.CPU).OrderByDescending(p=>p.Prioritet);
+                foreach(var process in toCpu)
                 {
                     if (!PutProcessToEmptyThread(threads, process))
                         break;
+                    else
+                    {
+                        waitings.Remove(process);
+                    }
                 }
 
                 // Проверяем, не ожидают ли выполнения более приоритетные процессы (если, что заменяем)
-                foreach (var process in toWorkCandidates.OrderByDescending(p => p.Prioritet))
+                foreach (var process in toCpu)
                 {
-                    if (ReplaceProcessToMoreHighPrioritet(threads, process))
+                    if (!PutOrReplaceProcessWithMoreHighPrioritet(threads, process, out var replaced))
                         break;
+                    else
+                    {
+                        waitings.Remove(process);
+                        if (replaced != null)
+                            waitings.Add(replaced);
+                    }
                 }
+
+                counter++;
             }
+            res.AddRow(counter, waitings.ToReport(), threads.ToReport(), hdd.ToReport());
             return res;
         }
 
@@ -104,13 +91,12 @@ namespace ProcessManager.Core
                 if (threads[i] == null)
                 {
                     threads[i] = process;
-                    process.Status = ProcessStatus.Work;
                     return true;
                 }
             return false;     
         }
 
-        static bool ReplaceProcessToMoreHighPrioritet(Process[] threads, Process process, out Process replaced)
+        static bool PutOrReplaceProcessWithMoreHighPrioritet(Process[] threads, Process process, out Process replaced)
         {
             for (var i = 0; i < threads.Length; i++)
             {
@@ -118,9 +104,6 @@ namespace ProcessManager.Core
                 {
                     replaced = threads[i];
                     threads[i] = process;
-                    process.Status = ProcessStatus.Work;
-                    if (replaced != null)
-                        replaced.Status = ProcessStatus.Wait;
                     return true;
                 }
             }
