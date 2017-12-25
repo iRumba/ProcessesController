@@ -31,7 +31,7 @@ namespace ProcessManager.Core
             while (allCount > completed.Count)
             {
                 // Процессы в работе выполняют работу (время текущего состояния уменьшается)
-                foreach (var process in inWork)
+                foreach (var process in inWork.ToList())
                 {
                     var tickResult = process.OnTick();
                     if (tickResult.Completed)
@@ -41,11 +41,24 @@ namespace ProcessManager.Core
                     }
                     else if (tickResult.StageCompleted)
                     {
+                        List<Process> listToAdd = null;
+                        switch (process.CurrentStage.Stage)
+                        {
+                            case ProcessStages.HDD:
+                                listToAdd = hdd;
+                                RemoveProcessFromthreads(threads, process);
+                                break;
+                            case ProcessStages.CPU:
+                                listToAdd = waitings;
+                                hdd.Remove(process);
+                                break;
+                        }
                         RemoveProcessFromthreads(threads, process);
-                        var list = process.CurrentStage.Stage == ProcessStages.CPU ? waitings : hdd;
-                        list.Add(process);
+                        listToAdd.Add(process);
                     }
                 }
+
+                //hdd.RemoveAll(p => p == null);
 
                 // Затыкаем дыры в работе приоритетными процессами
                 var toCpu = waitings.Where(p => p.CurrentStage.Stage == ProcessStages.CPU).OrderByDescending(p=>p.Prioritet);
@@ -73,8 +86,8 @@ namespace ProcessManager.Core
                 }
 
                 counter++;
+                res.AddRow(counter, waitings.ToReport(), threads.ToReport(), hdd.ToReport());
             }
-            res.AddRow(counter, waitings.ToReport(), threads.ToReport(), hdd.ToReport());
             return res;
         }
 
