@@ -54,10 +54,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Converters\TestConverter.cs" />
-    <Compile Include="TemplateSelectors\ReportColumnsTemplateSelector.cs" />
+    <Compile Include="Converters\ExistingToVisibilityConverter.cs" />
+    <Compile Include="DataGridProcessContainerColumn.cs" />
     <Compile Include="TestDataTemplate.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\ProcessesCreatingViewModel.cs" />
+    <Compile Include="ViewModels\ProcessViewModel.cs" />
+    <Compile Include="ViewModels\RelayCommand.cs" />
+    <Compile Include="ViewModels\StageViewModel.cs" />
+    <Compile Include="ViewModels\ViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

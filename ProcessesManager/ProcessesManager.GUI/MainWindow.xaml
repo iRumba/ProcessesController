@@ -5,31 +5,39 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProcessesManager.GUI"
         xmlns:vm="clr-namespace:ProcessesManager.GUI.ViewModels"
-        xmlns:ts="clr-namespace:ProcessesManager.GUI.TemplateSelectors"
         xmlns:conv="clr-namespace:ProcessesManager.GUI.Converters"
-        xmlns:coreModels="clr-namespace:ProcessManager.Core.Models;assembly=ProcessManager.Core"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Window.Resources>
-        <conv:TestConverter x:Key="TestConverter"/>
-
-        <local:TestDataTemplate x:Key="qwe" Prop="5">
-            <Border BorderBrush="Black" BorderThickness="2">
-                <TextBlock>
-                <Run Text="{Binding Name, Mode=OneWay}"></Run>
-                </TextBlock>
-            </Border>
-        </local:TestDataTemplate>
+        <conv:ExistingToVisibilityConverter x:Key="ExistingToVisibilityConverter"/>
+        
         <DataTemplate x:Key="ProcessTemplate">
-            <Border BorderBrush="Black" BorderThickness="2">
-                <TextBlock>
-                <Run Text="{Binding Name, Mode=OneWay}"></Run>
+            <Border BorderBrush="LightGray" BorderThickness="1" 
+                    Visibility="{Binding Converter={StaticResource ExistingToVisibilityConverter}}" Margin="2"
+                     VerticalAlignment="Top" Background="Beige">
+                <Border.ToolTip>
+                    <TextBlock>
+                        Имя процесса:
+                        <Run Text="{Binding Name, Mode=OneWay}"/>
+                        <LineBreak/>
+                        Стадия:
+                        <Run Text="{Binding Stage, Mode=OneWay}"/>
+                        <LineBreak/>
+                        Приоритет:
+                        <Run Text="{Binding Prioritet, Mode=OneWay}"/>
+                        <LineBreak/>
+                        Оставшееся время стадии:
+                        <Run Text="{Binding TimeToEnd, Mode=OneWay}"/>s.
+                    </TextBlock>
+                </Border.ToolTip>
+                <TextBlock Margin="2">
+                    <Run Text="{Binding Name, Mode=OneWay}"/>.<Run Text="{Binding Stage, Mode=OneWay}"/>(<Run Text="{Binding Prioritet, Mode=OneWay}"/>):
+                    <Run Text="{Binding TimeToEnd, Mode=OneWay}"/>s.
                 </TextBlock>
             </Border>
-
         </DataTemplate>
+        
         <DataTemplate x:Key="ProcessCollectionTemplate">
-            
             <ItemsControl ItemTemplate="{StaticResource ProcessTemplate}" ItemsSource="{Binding}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -38,87 +46,55 @@
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
         </DataTemplate>
-        
-        <DataTemplate x:Key="WaitingProcessesCollectionTemplate">
-            <ItemsControl ItemTemplate="{StaticResource ProcessTemplate}" ItemsSource="{Binding WaitingProcesses}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        </DataTemplate>
-
-        <DataTemplate x:Key="HddProcessesCollectionTemplate">
-            <ItemsControl ItemTemplate="{StaticResource ProcessTemplate}" ItemsSource="{Binding HddProcesses}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        </DataTemplate>
-
-        <Style x:Key="ProcessStyle" TargetType="DataGridCell">
-            <Setter Property="ContentTemplate" >
-                <Setter.Value>
-                    <DataTemplate>
-                        <Border BorderBrush="Black" BorderThickness="2">
-                            <TextBlock>
-                <Run Text="{Binding}"></Run>
-                            </TextBlock>
-                        </Border>
-
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="ProcessCollectionStyle" TargetType="DataGridCell">
-            <Setter Property="ContentTemplate" >
-                <Setter.Value>
-                    <DataTemplate>
-                        <ItemsControl ItemTemplate="{StaticResource ProcessTemplate}" ItemsSource="{Binding}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel Orientation="Horizontal"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="testStyle" TargetType="DataGridCell">
-            <Setter Property="ContentTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <Border BorderBrush="Red" BorderThickness="2">
-                            <TextBlock Text="{Binding}"/>
-                        </Border>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="AllowDrop" Value="{Binding qwe}"/>
-        </Style>
     </Window.Resources>
     <Window.DataContext>
         <vm:MainViewModel/>
     </Window.DataContext>
     <Grid>
-        <StackPanel>
-            <Button Click="Button_Click">Test</Button>
-            <DataGrid Name="dgReport" ItemsSource="{Binding Report.Rows}" AutoGeneratingColumn="DataGrid_AutoGeneratingColumn" AutoGenerateColumns="False">
-                <DataGrid.Resources>
-                </DataGrid.Resources>
-            </DataGrid>
-            <!--<ListView ItemsSource="{Binding Report.Rows}" Name="lvMain">
-                <ListView.View>
-                    <GridView>
-                        
-                    </GridView>
-                </ListView.View>
-            </ListView>-->
-        </StackPanel>
+        
+        <DockPanel>
+            <DockPanel DockPanel.Dock="Top" Margin="5">
+                <UniformGrid DockPanel.Dock="Right" Rows="1">
+                    <UniformGrid.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="Margin" Value="5"/>
+                        </Style>
+                    </UniformGrid.Resources>
+
+                </UniformGrid>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                    <StackPanel.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="Margin" Value="5"/>
+                            <Setter Property="Width" Value="80"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <Button Command="{Binding OpenProcessesWindowCommand}">
+                        <TextBlock TextWrapping="WrapWithOverflow">
+                            Управление процессами
+                        </TextBlock>
+                    </Button>
+                    <!--<Button Click="Button_Click">Test</Button>-->
+                    <Button Click="Button_Click">Cтарт</Button>
+
+                </StackPanel>
+                <StackPanel>
+                    <Label>Настройки среды:</Label>
+                    <WrapPanel Orientation="Horizontal">
+                        <Label>Количество потоков:</Label>
+                        <TextBox Width="30" MaxLines="1"/>
+                    </WrapPanel>
+                </StackPanel>
+            </DockPanel>
+            
+            <!--<ScrollViewer Height="250" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">-->
+                <DataGrid ItemsSource="{Binding ReportTable}" VerticalScrollBarVisibility="Auto"
+                      AutoGeneratingColumn="DataGrid_AutoGeneratingColumn" AutoGenerateColumns="True"
+                      IsReadOnly="True" MaxColumnWidth="200" HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray">
+                </DataGrid>
+            <!--</ScrollViewer>-->
+
+        </DockPanel>
 
     </Grid>
 </Window>

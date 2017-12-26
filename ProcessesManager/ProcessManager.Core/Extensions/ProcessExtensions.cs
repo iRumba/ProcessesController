@@ -15,7 +15,7 @@ namespace ProcessManager.Core.Extensions
                 return null;
 
             var res = new ReportProcess(process.ProcessName, 
-                process.CurrentStageIndex, 
+                process.CurrentStageIndex + 1, 
                 process.Prioritet, 
                 process.CurrentStage.LeftTime);
             return res;

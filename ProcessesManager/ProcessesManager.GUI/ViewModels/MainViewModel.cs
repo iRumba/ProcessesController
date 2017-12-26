@@ -6,44 +6,32 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace ProcessesManager.GUI.ViewModels
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public class MainViewModel : ViewModel
     {
-        Report _report;
-        dynamic _table;
+        public RelayCommand StartCommand { get; }
+        public RelayCommand OpenProcessesWindowCommand { get; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public Report Report
+        public MainViewModel()
         {
-            get
-            {
-                return _report;
-            }
-            set
-            {
-                _report = value;
-                OnPropertyChanged(nameof(Report));
-                OnPropertyChanged(nameof(ReportTable));
-            }
+            StartCommand = new RelayCommand(StartExecute, StartCanExecute);
+            OpenProcessesWindowCommand = new RelayCommand(OpenProcessesExecute, OpenProcessesCanExecute);
         }
 
-        List<DataColumn> DataColumns
+        [Dependencies(nameof(ReportTable))]
+        public Report Report
         {
-            get
-            {
-                var res = new List<DataColumn>();
-                res.Add(new DataColumn("Время", typeof(int)));
-                res.Add(new DataColumn("Ожидание", typeof(IEnumerable<ReportProcess>)));
-                for (var i = 0; i < Report.NumberOfCpus; i++)
-                {
-                    res.Add(new DataColumn($"Поток {i + 1}", typeof(ReportProcess)));
-                }
-                res.Add(new DataColumn("HDD", typeof(IEnumerable<ReportProcess>)));
-                return res;
-            }
+            get { return GetValue<Report>(); }
+            set { SetValue(value); }
+        }
+
+        public bool Processing
+        {
+            get { return GetValue<bool>(); }
+            set { SetValue(value); }
         }
 
         public DataTable ReportTable
@@ -74,22 +62,40 @@ namespace ProcessesManager.GUI.ViewModels
             }
         }
 
-        public dynamic Table
+        List<DataColumn> DataColumns
         {
             get
             {
-                return _table;
-            }
-            set
-            {
-                _table = value;
-                OnPropertyChanged(nameof(Table));
+                var res = new List<DataColumn>();
+                res.Add(new DataColumn("Время", typeof(int)));
+                res.Add(new DataColumn("Готовность", typeof(IEnumerable<ReportProcess>)));
+                for (var i = 0; i < Report.NumberOfCpus; i++)
+                {
+                    res.Add(new DataColumn($"Исполнение {i + 1}", typeof(ReportProcess)));
+                }
+                res.Add(new DataColumn("Ожидание", typeof(IEnumerable<ReportProcess>)));
+                return res;
             }
         }
 
-        void OnPropertyChanged(string name)
+        bool StartCanExecute(object parameter)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            return !Processing;
+        }
+
+        void StartExecute(object parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool OpenProcessesCanExecute(object parameter)
+        {
+            return !Processing;
+        }
+
+        void OpenProcessesExecute(object parameter)
+        {
+            throw new NotImplementedException();
         }
     }
 }
