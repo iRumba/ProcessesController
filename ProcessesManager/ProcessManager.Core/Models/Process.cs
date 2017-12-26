@@ -1,5 +1,4 @@
-﻿using ProcessManager.Core.Primitives;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,41 +35,12 @@ namespace ProcessManager.Core.Models
         }
 
 
-        public IEnumerable<ProcessStage> Stages
-        {
-            get
-            {
-                return _stages.AsReadOnly();
-            }
-        }
+        public List<ProcessStage> Stages { get; set; } = new List<ProcessStage>();
 
-        public Process(int prioritet, int cpu1Time, int hdd2Time, int cpu3Time)
+        public Process(int prioritet)
         {
-            _stages = new List<ProcessStage>
-            {
-                new ProcessStage(cpu1Time, ProcessStages.CPU),
-                new ProcessStage(hdd2Time, ProcessStages.HDD),
-                new ProcessStage(cpu3Time, ProcessStages.CPU),
-            };
+            _stages = new List<ProcessStage>();
             Prioritet = prioritet;
-        }
-
-        public IEnumerable<ProcessStage> AddStages(int hddTime, int cpuTime)
-        {
-            var res = new List<ProcessStage>
-            {
-                new ProcessStage(hddTime, ProcessStages.HDD),
-                new ProcessStage(cpuTime, ProcessStages.CPU),
-            };
-            _stages.AddRange(res);
-            return res.AsReadOnly();
-        }
-
-        public void RemoveStages(int firstIndex)
-        {
-            if (_stages.Count < 5)
-                throw new InvalidOperationException("Количество этапов не может быть меньше 3");
-            _stages.RemoveRange(firstIndex, 2);
         }
 
         internal ProcessTickResult OnTick()

@@ -1,4 +1,4 @@
-﻿<Window x:Class="ProcessesManager.GUI.MainWindow"
+﻿<Window x:Class="ProcessesManager.GUI.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,7 +7,7 @@
         xmlns:vm="clr-namespace:ProcessesManager.GUI.ViewModels"
         xmlns:conv="clr-namespace:ProcessesManager.GUI.Converters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Главное окно" Height="350" Width="525">
     <Window.Resources>
         <conv:ExistingToVisibilityConverter x:Key="ExistingToVisibilityConverter"/>
         

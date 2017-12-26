@@ -11,8 +11,14 @@ namespace ProcessesManager.GUI.ViewModels
     {
         public RelayCommand AddProcessCommand { get; }
         public RelayCommand RemoveProcessCommand { get; }
+        public RelayCommand ImportCommand { get; }
+        public RelayCommand ExportCommand { get; }
 
-        public ObservableCollection<ProcessViewModel> Processes { get; } = new ObservableCollection<ProcessViewModel>();
+        public ObservableCollection<ProcessViewModel> Processes
+        {
+            get { return GetValue<ObservableCollection<ProcessViewModel>>(); }
+            set { SetValue(value); }
+        }
 
         public ProcessesCreatingViewModel()
         {

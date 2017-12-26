@@ -46,7 +46,6 @@
     <Compile Include="Models\Report.cs" />
     <Compile Include="Models\ReportProcess.cs" />
     <Compile Include="Models\ReportRow.cs" />
-    <Compile Include="Primitives\LockedObject.cs" />
     <Compile Include="Manager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

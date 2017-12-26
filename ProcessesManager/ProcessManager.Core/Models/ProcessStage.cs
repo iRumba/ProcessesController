@@ -1,5 +1,4 @@
-﻿using ProcessManager.Core.Primitives;
-using System;
+﻿using System;
 
 namespace ProcessManager.Core.Models
 {
@@ -19,12 +18,10 @@ namespace ProcessManager.Core.Models
         }
 
         // Тип этапа не должен меняться в процессе исполнения программы, поэтому сеттера нет.
-        public ProcessStages Stage { get; }
 
-        public ProcessStage(int seconds, ProcessStages stage)
+        public ProcessStage(int seconds)
         {
             TimeToStage = seconds;
-            Stage = stage;
         }
 
         internal ProcessStageTickResult OnTick()
@@ -35,12 +32,6 @@ namespace ProcessManager.Core.Models
                 return new ProcessStageTickResult(true);
             return new ProcessStageTickResult(false);
         }
-    }
-
-    public enum ProcessStages
-    {
-        CPU,
-        HDD,
     }
 
     public class ProcessStageTickResult

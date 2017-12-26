@@ -1,6 +1,8 @@
-﻿using ProcessManager.Core.Models;
+﻿using ProcessManager.Core;
+using ProcessManager.Core.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
@@ -19,6 +21,14 @@ namespace ProcessesManager.GUI.ViewModels
         {
             StartCommand = new RelayCommand(StartExecute, StartCanExecute);
             OpenProcessesWindowCommand = new RelayCommand(OpenProcessesExecute, OpenProcessesCanExecute);
+        }
+
+        public ObservableCollection<ProcessViewModel> Processes { get; } = new ObservableCollection<ProcessViewModel>();
+
+        public int NumberOfThreads
+        {
+            get { return GetValue<int>(); }
+            set { SetValue(value); }
         }
 
         [Dependencies(nameof(ReportTable))]
@@ -80,12 +90,14 @@ namespace ProcessesManager.GUI.ViewModels
 
         bool StartCanExecute(object parameter)
         {
-            return !Processing;
+            return !Processing && NumberOfThreads > 0 && Processes.Count > 0;
         }
 
-        void StartExecute(object parameter)
+        async void StartExecute(object parameter)
         {
-            throw new NotImplementedException();
+            var manager = new Manager();
+            var report = await manager.StartAsync(Processes.ToModel(), NumberOfThreads);
+            Report = report;
         }
 
         bool OpenProcessesCanExecute(object parameter)

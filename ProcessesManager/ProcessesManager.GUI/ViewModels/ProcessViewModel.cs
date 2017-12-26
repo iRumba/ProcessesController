@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -7,19 +8,23 @@ using System.Threading.Tasks;
 
 namespace ProcessesManager.GUI.ViewModels
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class ProcessViewModel : ViewModel
     {
         public RelayCommand AddStageCommand { get; }
         public RelayCommand RemoveStageCommand { get; set; }
 
+        [JsonProperty]
         public ObservableCollection<StageViewModel> Stages { get; } = new ObservableCollection<StageViewModel>();
 
+        [JsonProperty]
         public string Name
         {
             get { return GetValue<string>(); }
             set { SetValue(value); }
         }
 
+        [JsonProperty]
         public int Prioritet
         {
             get { return GetValue<int>(); }

@@ -1,6 +1,5 @@
 ﻿using ProcessManager.Core.Extensions;
 using ProcessManager.Core.Models;
-using ProcessManager.Core.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,13 +41,14 @@ namespace ProcessManager.Core
                     else if (tickResult.StageCompleted)
                     {
                         List<Process> listToAdd = null;
-                        switch (process.CurrentStage.Stage)
+                        var stageAlternate = process.CurrentStageIndex % 2;
+                        switch (stageAlternate)
                         {
-                            case ProcessStages.HDD:
+                            case 1:
                                 listToAdd = hdd;
                                 RemoveProcessFromthreads(threads, process);
                                 break;
-                            case ProcessStages.CPU:
+                            case 2:
                                 listToAdd = waitings;
                                 hdd.Remove(process);
                                 break;
@@ -58,10 +58,8 @@ namespace ProcessManager.Core
                     }
                 }
 
-                //hdd.RemoveAll(p => p == null);
-
                 // Затыкаем дыры в работе приоритетными процессами
-                var toCpu = waitings.Where(p => p.CurrentStage.Stage == ProcessStages.CPU).OrderByDescending(p=>p.Prioritet);
+                var toCpu = waitings.Where(p => p.CurrentStageIndex % 2 == 0).OrderByDescending(p=>p.Prioritet);
                 foreach(var process in toCpu)
                 {
                     if (!PutProcessToEmptyThread(threads, process))

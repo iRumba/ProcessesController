@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ProcessesManager.GUI
+namespace ProcessesManager.GUI.Views
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
