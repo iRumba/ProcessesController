@@ -3,18 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ProcessesManager.GUI"
         xmlns:vm="clr-namespace:ProcessesManager.GUI.ViewModels"
         xmlns:conv="clr-namespace:ProcessesManager.GUI.Converters"
         mc:Ignorable="d"
-        Title="Главное окно" Height="500" Width="800">
+        Title="Главное окно" Height="500" Width="800" MinWidth="400" MinHeight="200">
     <Window.Resources>
         <conv:ExistingToVisibilityConverter x:Key="ExistingToVisibilityConverter"/>
         
         <DataTemplate x:Key="ProcessTemplate">
             <Border BorderBrush="LightGray" BorderThickness="1" 
                     Visibility="{Binding Converter={StaticResource ExistingToVisibilityConverter}}" Margin="2"
-                     VerticalAlignment="Top" Background="Beige">
+                     VerticalAlignment="Top" Background="Beige" CornerRadius="2" TextBlock.Foreground="Black">
                 <Border.ToolTip>
                     <TextBlock>
                         Имя процесса:
@@ -82,7 +81,7 @@
                     <Label>Настройки среды:</Label>
                     <WrapPanel Orientation="Horizontal">
                         <Label>Количество потоков:</Label>
-                        <TextBox Width="30" MaxLines="1" Text="{Binding NumberOfThreads, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Width="30" VerticalAlignment="Center" Text="{Binding NumberOfThreads, UpdateSourceTrigger=PropertyChanged}"/>
                     </WrapPanel>
                 </StackPanel>
             </DockPanel>

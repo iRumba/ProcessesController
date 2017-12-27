@@ -3,12 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ProcessesManager.GUI.Views"
         xmlns:vm="clr-namespace:ProcessesManager.GUI.ViewModels"
         xmlns:conv="clr-namespace:ProcessesManager.GUI.Converters"
         mc:Ignorable="d"
         Name="thisWindow"
-        Title="Управление процессами" Height="400" Width="700" Closing="thisWindow_Closing">
+        Title="Управление процессами" Height="400" Width="700" Closing="thisWindow_Closing" MinWidth="500" MinHeight="300">
     <Window.Resources>
         <conv:ExistingToVisibilityConverter x:Key="ExistingToVisibilityConverter"/>
     </Window.Resources>
@@ -58,18 +57,17 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
-        <!--Visibility="{Binding SelectedItem, ElementName=lstProcesses, Converter={StaticResource ExistingToVisibilityConverter}}"-->
         <DockPanel Grid.Row="1" Grid.Column="1" DataContext="{Binding SelectedItem, ElementName=lstProcesses}"
                    Margin="5"
-                   >
+                   Visibility="{Binding SelectedItem, ElementName=lstProcesses, Converter={StaticResource ExistingToVisibilityConverter}}">
             <StackPanel DockPanel.Dock="Top">
                 <WrapPanel Orientation="Horizontal" Margin="5">
                     <Label>Имя:</Label>
-                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" MaxLines="1" Width="70"/>
+                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Width="70"/>
                 </WrapPanel>
                 <WrapPanel Orientation="Horizontal" Margin="5">
                     <Label>Приоритет:</Label>
-                    <TextBox Text="{Binding Prioritet, UpdateSourceTrigger=PropertyChanged}" MaxLines="1" Width="30"/>
+                    <TextBox Text="{Binding Prioritet, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Width="30"/>
                 </WrapPanel>
             </StackPanel>
 
@@ -80,22 +78,12 @@
                 <DockPanel>
                     <Label DockPanel.Dock="Top">Этапы:</Label>
                     <WrapPanel Orientation="Horizontal" DockPanel.Dock="Bottom" DataContext="{Binding SelectedItem, ElementName=lstStages}"
-                                Margin="5">
+                               Margin="5"
+                               Visibility="{Binding SelectedItem, ElementName=lstStages, Converter={StaticResource ExistingToVisibilityConverter}}">
                         <Label>Время:</Label>
-                        <TextBox Text="{Binding Time, UpdateSourceTrigger=PropertyChanged}" Width="30"/>
+                        <TextBox Text="{Binding Time, UpdateSourceTrigger=PropertyChanged}" Width="30" VerticalAlignment="Center"/>
                     </WrapPanel>
                     <ListBox ItemsSource="{Binding Stages}" Name="lstStages" AlternationCount="2" HorizontalContentAlignment="Stretch">
-                        <!--<ListBox.Resources>
-                            <DataTemplate x:Key="General">
-                                <TextBlock Text="{Binding Time}"/>
-                            </DataTemplate>
-                            <DataTemplate x:Key="Cpu">
-                                <TextBlock>CPU:</TextBlock>
-                            </DataTemplate>
-                            <DataTemplate x:Key="Hdd">
-                                <TextBlock>HDD:</TextBlock>
-                            </DataTemplate>
-                        </ListBox.Resources>-->
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel>
@@ -139,7 +127,7 @@
                 <StackPanel>
                     <WrapPanel Orientation="Horizontal">
                         <Label>Количество процессов:</Label>
-                        <TextBox Width="30" Text="{Binding ProcessesCount}"/>
+                        <TextBox Width="30" Text="{Binding ProcessesCount}" VerticalAlignment="Center"/>
                     </WrapPanel>
                     <Label>Диапазон приоритетов:</Label>
                     <Grid>
