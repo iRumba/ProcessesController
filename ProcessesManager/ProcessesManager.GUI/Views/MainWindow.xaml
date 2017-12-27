@@ -75,14 +75,14 @@
                         </TextBlock>
                     </Button>
                     <!--<Button Click="Button_Click">Test</Button>-->
-                    <Button Click="Button_Click">Cтарт</Button>
+                    <Button Command="{Binding StartCommand}">Cтарт</Button>
 
                 </StackPanel>
                 <StackPanel>
                     <Label>Настройки среды:</Label>
                     <WrapPanel Orientation="Horizontal">
                         <Label>Количество потоков:</Label>
-                        <TextBox Width="30" MaxLines="1"/>
+                        <TextBox Width="30" MaxLines="1" Text="{Binding NumberOfThreads}"/>
                     </WrapPanel>
                 </StackPanel>
             </DockPanel>

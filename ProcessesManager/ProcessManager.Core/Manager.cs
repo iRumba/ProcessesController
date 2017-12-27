@@ -48,7 +48,7 @@ namespace ProcessManager.Core
                                 listToAdd = hdd;
                                 RemoveProcessFromthreads(threads, process);
                                 break;
-                            case 2:
+                            case 0:
                                 listToAdd = waitings;
                                 hdd.Remove(process);
                                 break;

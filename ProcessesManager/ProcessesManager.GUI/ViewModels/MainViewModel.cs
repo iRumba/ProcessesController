@@ -1,4 +1,5 @@
-﻿using ProcessManager.Core;
+﻿using ProcessesManager.GUI.Views;
+using ProcessManager.Core;
 using ProcessManager.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace ProcessesManager.GUI.ViewModels
 
         public MainViewModel()
         {
+            NumberOfThreads = 2;
             StartCommand = new RelayCommand(StartExecute, StartCanExecute);
             OpenProcessesWindowCommand = new RelayCommand(OpenProcessesExecute, OpenProcessesCanExecute);
         }
@@ -95,9 +97,13 @@ namespace ProcessesManager.GUI.ViewModels
 
         async void StartExecute(object parameter)
         {
+            Processing = true;
+
             var manager = new Manager();
             var report = await manager.StartAsync(Processes.ToModel(), NumberOfThreads);
             Report = report;
+            Processing = false;
+            //CommandManager.InvalidateRequerySuggested();
         }
 
         bool OpenProcessesCanExecute(object parameter)
@@ -107,7 +113,10 @@ namespace ProcessesManager.GUI.ViewModels
 
         void OpenProcessesExecute(object parameter)
         {
-            throw new NotImplementedException();
+            var wnd = new ProcessesManagementView();
+            wnd.ViewModel.Processes = Processes;
+            wnd.ShowDialog();
+            //CommandManager.InvalidateRequerySuggested();
         }
     }
 }

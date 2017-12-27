@@ -8,8 +8,6 @@ namespace ProcessManager.Core.Models
 {
     public class Process
     {
-        List<ProcessStage> _stages;
-
         public int CurrentStageIndex { get; private set; }
         public ProcessStage CurrentStage
         {
@@ -17,7 +15,7 @@ namespace ProcessManager.Core.Models
             {
                 if (Completed)
                     return null;
-                return _stages[CurrentStageIndex];
+                return Stages[CurrentStageIndex];
             }
         }
 
@@ -30,7 +28,7 @@ namespace ProcessManager.Core.Models
         {
             get
             {
-                return CurrentStageIndex == _stages.Count;
+                return CurrentStageIndex == Stages.Count;
             }
         }
 
@@ -39,7 +37,7 @@ namespace ProcessManager.Core.Models
 
         public Process(int prioritet)
         {
-            _stages = new List<ProcessStage>();
+            Stages = new List<ProcessStage>();
             Prioritet = prioritet;
         }
 

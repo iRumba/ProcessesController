@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace ProcessesManager.GUI.ViewModels
 {
@@ -75,6 +76,11 @@ namespace ProcessesManager.GUI.ViewModels
         protected void OnPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        protected bool CanExecuteTrue(object parameter)
+        {
+            return true;
         }
     }
 

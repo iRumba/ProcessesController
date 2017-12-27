@@ -11,7 +11,7 @@ namespace ProcessesManager.GUI.ViewModels
     {
         public static Process ToModel(this ProcessViewModel vm)
         {
-            var res = new Process(vm.Prioritet);
+            var res = new Process(vm.Prioritet) { ProcessName = vm.Name };
             res.Stages = vm.Stages.ToModel().ToList();
             return res;
         }

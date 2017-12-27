@@ -39,17 +39,17 @@ namespace ProcessesManager.GUI.Views
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            var processManager = new Manager();
-            var processes = new List<Process>
-            {
-                new Process(1,5,7,9){ ProcessName = "pr1" },
-                new Process(2,5,7,9){ ProcessName = "pr2" },
-                new Process(3,5,7,9){ ProcessName = "pr3" },
-                new Process(4,5,7,9){ ProcessName = "pr4" },
-            };
-            var res = await processManager.StartAsync(processes, 2);
+            //var processManager = new Manager();
+            //var processes = new List<Process>
+            //{
+            //    new Process(1,5,7,9){ ProcessName = "pr1" },
+            //    new Process(2,5,7,9){ ProcessName = "pr2" },
+            //    new Process(3,5,7,9){ ProcessName = "pr3" },
+            //    new Process(4,5,7,9){ ProcessName = "pr4" },
+            //};
+            //var res = await processManager.StartAsync(processes, 2);
 
-            Vm.Report = res;
+            //Vm.Report = res;
         }
 
         private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)

@@ -60,7 +60,6 @@
     <Compile Include="Classes\ProcessesFileLoader.cs" />
     <Compile Include="Converters\ExistingToVisibilityConverter.cs" />
     <Compile Include="DataGridProcessContainerColumn.cs" />
-    <Compile Include="TestDataTemplate.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ProcessesCreatingViewModel.cs" />
     <Compile Include="ViewModels\ProcessesGeneratorViewModel.cs" />

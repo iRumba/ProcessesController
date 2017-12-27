@@ -4,9 +4,127 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProcessesManager.GUI.Views"
+        xmlns:vm="clr-namespace:ProcessesManager.GUI.ViewModels"
+        xmlns:conv="clr-namespace:ProcessesManager.GUI.Converters"
         mc:Ignorable="d"
-        Title="ProcessesManagementView" Height="300" Width="300">
+        Name="thisWindow"
+        Title="Управление процессами" Height="400" Width="700">
+    <Window.Resources>
+        <conv:ExistingToVisibilityConverter x:Key="ExistingToVisibilityConverter"/>
+    </Window.Resources>
+    <Window.DataContext>
+        <vm:ProcessesCreatingViewModel/>
+    </Window.DataContext>
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Label>Процессы:</Label>
+        <Label Grid.Column="1">Текущий процесс:</Label>
+        <Label Grid.Column="2">Генератор:</Label>
+        <DockPanel Grid.Row="1" Margin="5">
+            <WrapPanel DockPanel.Dock="Bottom">
+                <WrapPanel.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Margin" Value="5"/>
+                        <Setter Property="Padding" Value="5"/>
+                    </Style>
+                </WrapPanel.Resources>
+                <Button Command="{Binding AddProcessCommand}">Добавить</Button>
+                <Button Command="{Binding ImportCommand}">Импорт</Button>
+                <Button Command="{Binding ExportCommand}">Экспорт</Button>
+                <Button Command="{Binding ClearCommand}">Очистить</Button>
+            </WrapPanel>
+            <ListBox ItemsSource="{Binding Processes}" Name="lstProcesses" HorizontalContentAlignment="Stretch">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Command="{Binding DataContext.RemoveProcessCommand, ElementName=thisWindow}"
+                                    CommandParameter="{Binding}" Width="20" Height="20" VerticalContentAlignment="Center">X</Button>
+                            <TextBlock TextWrapping="WrapWithOverflow">
+                                <Run Text="{Binding Name}"/>(<Run Text="{Binding Prioritet}"/>).
+                                <Run Text="{Binding Stages.Count, Mode=OneWay}"/>
+                                этапов
+                            </TextBlock>
+                        </DockPanel>
+
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+        <!--Visibility="{Binding SelectedItem, ElementName=lstProcesses, Converter={StaticResource ExistingToVisibilityConverter}}"-->
+        <DockPanel Grid.Row="1" Grid.Column="1" DataContext="{Binding SelectedItem, ElementName=lstProcesses}"
+                   
+                   >
+            <StackPanel DockPanel.Dock="Top">
+                <WrapPanel Orientation="Horizontal" Margin="5">
+                    <Label>Имя:</Label>
+                    <TextBox Text="{Binding Name}" MaxLines="1" Width="70"/>
+                </WrapPanel>
+                <WrapPanel Orientation="Horizontal" Margin="5">
+                    <Label>Приоритет:</Label>
+                    <TextBox Text="{Binding Prioritet}" MaxLines="1" Width="30"/>
+                </WrapPanel>
+            </StackPanel>
+
+            <DockPanel Margin="5">
+                <WrapPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+                    <Button Margin="5" Padding="5" Command="{Binding AddStageCommand}">Добавить:</Button>
+                </WrapPanel>
+                <DockPanel>
+                    <Label DockPanel.Dock="Top">Этапы:</Label>
+                    <WrapPanel Orientation="Horizontal" DockPanel.Dock="Bottom" DataContext="{Binding SelectedItem, ElementName=lstStages}"
+                                Margin="5">
+                        <Label>Время:</Label>
+                        <TextBox Text="{Binding Time}" Width="30"/>
+                    </WrapPanel>
+                    <ListBox ItemsSource="{Binding Stages}" Name="lstStages" AlternationCount="2" HorizontalContentAlignment="Stretch">
+                        <!--<ListBox.Resources>
+                            <DataTemplate x:Key="General">
+                                <TextBlock Text="{Binding Time}"/>
+                            </DataTemplate>
+                            <DataTemplate x:Key="Cpu">
+                                <TextBlock>CPU:</TextBlock>
+                            </DataTemplate>
+                            <DataTemplate x:Key="Hdd">
+                                <TextBlock>HDD:</TextBlock>
+                            </DataTemplate>
+                        </ListBox.Resources>-->
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <Button Width="20" Height="20" VerticalAlignment="Center"
+                                            Command="{Binding DataContext.RemoveStageCommand, ElementName=lstStages}" CommandParameter="{Binding}">X</Button>
+                                    <TextBlock>
+                                    <Run>
+                                        <Run.Style>
+                                            <Style TargetType="Run">
+                                                <Style.Triggers>
+                                                    <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                                                        <Setter Property="Text" Value="CPU:"/>
+                                                    </Trigger>
+                                                    <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                                        <Setter Property="Text" Value="HDD:"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Run.Style>
+                                    </Run>
+                                    <Run Text="{Binding Time}"/>s.
+                                    </TextBlock>
+                                </DockPanel>
+
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </DockPanel>
+        </DockPanel>
     </Grid>
 </Window>

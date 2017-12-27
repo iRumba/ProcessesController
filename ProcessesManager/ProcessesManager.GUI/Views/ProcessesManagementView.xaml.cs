@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProcessesManager.GUI.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,13 @@ namespace ProcessesManager.GUI.Views
     /// </summary>
     public partial class ProcessesManagementView : Window
     {
+        public ProcessesCreatingViewModel ViewModel
+        {
+            get
+            {
+                return DataContext as ProcessesCreatingViewModel;
+            }
+        }
         public ProcessesManagementView()
         {
             InitializeComponent();
