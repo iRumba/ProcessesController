@@ -28,13 +28,25 @@ namespace ProcessManager.Core.Models
         {
             if (row.WorkingProcesses.Count() != NumberOfCpus)
                 throw new InvalidOperationException("Неверная строка отчета");
+
+            var last = _rows.LastOrDefault();
             _rows.Add(row);
+            if (last != null && last.IsSpecial && last.Time == row.Time)
+            {
+                last.IsSpecial = false;
+                _rows.Last().IsSpecial = true;
+            }
         }
 
-        public void AddRow(int time, IEnumerable<ReportProcess> waitingProcesses, IEnumerable<ReportProcess> workingProcesses, IEnumerable<ReportProcess> hddProcesses)
+        public void AddRow(int time, IEnumerable<ReportProcess> waitingProcesses, IEnumerable<ReportProcess> workingProcesses, IEnumerable<ReportProcess> hddProcesses, bool isSpecial = false)
         {
-            var row = new ReportRow(time, waitingProcesses, workingProcesses, hddProcesses);
+            var row = new ReportRow(time, waitingProcesses, workingProcesses, hddProcesses, isSpecial);
             AddRow(row);
+        }
+
+        public void RemoveLast()
+        {
+            _rows.Remove(_rows.Last());
         }
     }
 }

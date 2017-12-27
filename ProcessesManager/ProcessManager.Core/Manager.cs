@@ -27,6 +27,7 @@ namespace ProcessManager.Core
             res.AddRow(counter, waitings.ToReport(), threads.ToReport(), hdd.ToReport());
             while (allCount > completed.Count)
             {
+                var specialFlag = false;
                 // Процессы в работе выполняют работу (время текущего состояния уменьшается)
                 foreach (var process in inWork.ToList())
                 {
@@ -49,13 +50,19 @@ namespace ProcessManager.Core
                             case 0:
                                 listToAdd = waitings;
                                 hdd.Remove(process);
+                                specialFlag = true;
                                 break;
                         }
                         RemoveProcessFromthreads(threads, process);
                         listToAdd.Add(process);
+
                     }
                 }
+                counter++;
+                if (specialFlag)
+                    res.AddRow(counter, waitings.ToReport(), threads.ToReport(), hdd.ToReport(), true);
 
+                var removeSpecialFlag = true;
                 // Затыкаем дыры в работе приоритетными процессами
                 var toCpu = waitings.Where(p => p.CurrentStageIndex % 2 == 0).OrderByDescending(p=>p.Prioritet);
                 foreach(var process in toCpu)
@@ -64,6 +71,7 @@ namespace ProcessManager.Core
                         break;
                     else
                     {
+                        removeSpecialFlag = false;
                         waitings.Remove(process);
                     }
                 }
@@ -71,17 +79,20 @@ namespace ProcessManager.Core
                 // Проверяем, не ожидают ли выполнения более приоритетные процессы (если, что заменяем)
                 foreach (var process in toCpu)
                 {
-                    if (!PutOrReplaceProcessWithMoreHighPrioritet(threads, process, out var replaced))
+                    if (!ReplaceProcessWithMoreHighPrioritet(threads, process, out var replaced))
                         break;
                     else
                     {
+                        removeSpecialFlag = false;
                         waitings.Remove(process);
                         if (replaced != null)
                             waitings.Add(replaced);
                     }
                 }
 
-                counter++;
+                if (specialFlag && removeSpecialFlag)
+                    res.RemoveLast();
+                
                 res.AddRow(counter, waitings.ToReport(), threads.ToReport(), hdd.ToReport());
             }
             return res;
@@ -105,16 +116,23 @@ namespace ProcessManager.Core
             return false;     
         }
 
-        static bool PutOrReplaceProcessWithMoreHighPrioritet(Process[] threads, Process process, out Process replaced)
+        static bool ReplaceProcessWithMoreHighPrioritet(Process[] threads, Process process, out Process replaced)
         {
+            var minIndex = -1;
+            var minPriority = int.MaxValue;
             for (var i = 0; i < threads.Length; i++)
             {
-                if (threads[i] == null || threads[i].Prioritet < process.Prioritet)
+                if (threads[i] != null && threads[i].Prioritet < minPriority)
                 {
-                    replaced = threads[i];
-                    threads[i] = process;
-                    return true;
+                    minPriority = threads[i].Prioritet;
+                    minIndex = i;
                 }
+            }
+            if (minPriority > 0 && minPriority < process.Prioritet)
+            {
+                replaced = threads[minIndex];
+                threads[minIndex] = process;
+                return true;
             }
             replaced = null;
             return false;

@@ -137,16 +137,18 @@ namespace ProcessesManager.GUI.ViewModels
             return Processes != null && Processes.Count > 0;
         }
 
-        bool CanGenerate(object parameter)
-        {
-            return Generator.IsValid;
-        }
+        //bool CanGenerate(object parameter)
+        //{
+        //    return Generator.IsValid;
+        //}
 
         void Generate(object parameter)
         {
             if (!Generator.IsValid)
             {
-                ShowValidationDetailsMessage();
+                //foreach (var det in Generator.ValidationDetails)
+                //    ValidationDetails.Add(det);
+                Generator.ShowValidationDetailsMessage();
                 return;
             }
             for (var i = 0; i < Generator.ProcessesCount; i++)

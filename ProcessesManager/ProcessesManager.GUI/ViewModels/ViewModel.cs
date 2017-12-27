@@ -90,7 +90,7 @@ namespace ProcessesManager.GUI.ViewModels
             return true;
         }
 
-        protected void ShowValidationDetailsMessage()
+        internal void ShowValidationDetailsMessage()
         {
             MessageBox.Show(ValidationDetailsString, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }

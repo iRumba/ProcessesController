@@ -59,7 +59,10 @@ namespace ProcessesManager.GUI.ViewModels
                     var row = res.NewRow();
 
                     var columnIndex = 0;
-                    row[columnIndex++] = reportRow.Time;
+                    var time = $"{reportRow.Time}";
+                    if (reportRow.IsSpecial)
+                        time = $"{time}'";
+                    row[columnIndex++] = time;
                     row[columnIndex++] = reportRow.WaitingProcesses;
 
                     foreach (var process in reportRow.WorkingProcesses)
@@ -81,7 +84,7 @@ namespace ProcessesManager.GUI.ViewModels
             get
             {
                 var res = new List<DataColumn>();
-                res.Add(new DataColumn("Время", typeof(int)));
+                res.Add(new DataColumn("Время", typeof(string)));
                 res.Add(new DataColumn("Готовность", typeof(IEnumerable<ReportProcess>)));
                 for (var i = 0; i < Report.NumberOfCpus; i++)
                 {

@@ -12,13 +12,15 @@ namespace ProcessManager.Core.Models
         public List<ReportProcess> WaitingProcesses { get; }
         public List<ReportProcess> WorkingProcesses { get; }
         public List<ReportProcess> HddProcesses { get; }
+        public bool IsSpecial { get; set; }
 
-        public ReportRow(int time, IEnumerable<ReportProcess> waitingProcesses, IEnumerable<ReportProcess> workingProcesses, IEnumerable<ReportProcess> hddProcesses)
+        public ReportRow(int time, IEnumerable<ReportProcess> waitingProcesses, IEnumerable<ReportProcess> workingProcesses, IEnumerable<ReportProcess> hddProcesses, bool isSpecial)
         {
             Time = time;
             WaitingProcesses = waitingProcesses.ToList();
             WorkingProcesses = workingProcesses.ToList();
             HddProcesses = hddProcesses.ToList();
+            IsSpecial = isSpecial;
         }
     }
 }
