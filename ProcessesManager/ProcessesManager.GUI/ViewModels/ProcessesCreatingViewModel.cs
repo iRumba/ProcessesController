@@ -44,14 +44,6 @@ namespace ProcessesManager.GUI.ViewModels
             Processes.Add(process);
         }
 
-        string ChangeName()
-        {
-            var counter = 0;
-            var name = $"Пр_{++counter}";
-            while (Processes.Any(p => p.Name == (name = $"Пр_{counter++}"))) { }
-            return name;
-        }
-
         void RemoveProcess(object parameter)
         {
             var process = (ProcessViewModel)parameter;
@@ -65,6 +57,11 @@ namespace ProcessesManager.GUI.ViewModels
 
         void Export(object parameter)
         {
+            if (!IsValid)
+            {
+                ShowValidationDetailsMessage();
+                return;
+            }
             try
             {
                 var dlg = new SaveFileDialog();
@@ -81,7 +78,7 @@ namespace ProcessesManager.GUI.ViewModels
             }
             catch (Exception ex)
             {
-                var message = "Попытка экспорта файл завершилась ошибкой:";
+                var message = "Попытка экспорта в файл завершилась ошибкой:";
                 var currentEx = ex;
                 while (currentEx != null)
                 {
@@ -114,7 +111,7 @@ namespace ProcessesManager.GUI.ViewModels
             }
             catch(Exception ex)
             {
-                var message = "Попытка импорта файл завершилась ошибкой:";
+                var message = "Попытка импорта из файла завершилась ошибкой:";
                 var currentEx = ex;
                 while(currentEx != null)
                 {
@@ -172,6 +169,18 @@ namespace ProcessesManager.GUI.ViewModels
                 }
                 Processes.Add(process);
             }
+        }
+
+        /// <summary>
+        /// Генирируем имя процесса по шаблону Пр_{порядковый номер}. 
+        /// </summary>
+        /// <returns></returns>
+        string ChangeName()
+        {
+            var counter = 0;
+            var name = $"Пр_{++counter}";
+            while (Processes.Any(p => p.Name == (name = $"Пр_{counter++}"))) { }
+            return name;
         }
 
         protected override bool Validate()

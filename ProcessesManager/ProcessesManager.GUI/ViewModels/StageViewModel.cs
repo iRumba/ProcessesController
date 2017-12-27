@@ -8,14 +8,8 @@ namespace ProcessesManager.GUI.ViewModels
         [JsonProperty]
         public int Time
         {
-            get
-            {
-                return GetValue<int>();
-            }
-            set
-            {
-                SetValue(value);
-            }
+            get { return GetValue<int>(); }
+            set { SetValue(value); }
         }
 
         protected override bool Validate()

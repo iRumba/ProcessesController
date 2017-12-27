@@ -11,6 +11,7 @@ namespace ProcessesManager.GUI.Classes
         {
             get
             {
+                // Так как числа генерируются почти одновременно, пришлось сделать такой хак. 
                 return new Random((int)(_sw.ElapsedTicks % int.MaxValue));
             }
         }

@@ -14,8 +14,8 @@ namespace ProcessesManager.GUI.ViewModels
 
         public MainViewModel()
         {
-            NumberOfThreads = 2;
-            StartCommand = new RelayCommand(StartExecute, CanExecuteTrue);
+            NumberOfThreads = 3;
+            StartCommand = new RelayCommand(StartExecute, StartCanExecute);
             OpenProcessesWindowCommand = new RelayCommand(OpenProcessesExecute, OpenProcessesCanExecute);
         }
 
@@ -40,6 +40,11 @@ namespace ProcessesManager.GUI.ViewModels
             set { SetValue(value); }
         }
 
+        /// <summary>
+        /// Здесь я перегоняю тип Report в тип DataTable для удобства отображения в GridView.
+        /// Это нужно, так как количество столбцов у нас динамическое, а количество полей в классах C# статическое
+        /// и определяется на этапе компиляции
+        /// </summary>
         public DataTable ReportTable
         {
             get
@@ -68,6 +73,9 @@ namespace ProcessesManager.GUI.ViewModels
             }
         }
 
+        /// <summary>
+        /// Здесь генерируются столбцы для DataTable
+        /// </summary>
         List<DataColumn> DataColumns
         {
             get
@@ -86,7 +94,7 @@ namespace ProcessesManager.GUI.ViewModels
 
         bool StartCanExecute(object parameter)
         {
-            return !Processing && NumberOfThreads > 0 && Processes.Count > 0;
+            return !Processing;
         }
 
         async void StartExecute(object parameter)
@@ -101,7 +109,6 @@ namespace ProcessesManager.GUI.ViewModels
             var report = await manager.StartAsync(Processes.ToModel(), NumberOfThreads);
             Report = report;
             Processing = false;
-            //CommandManager.InvalidateRequerySuggested();
         }
 
         bool OpenProcessesCanExecute(object parameter)
@@ -114,7 +121,6 @@ namespace ProcessesManager.GUI.ViewModels
             var wnd = new ProcessesManagementView();
             wnd.ViewModel.Processes = Processes;
             wnd.ShowDialog();
-            //CommandManager.InvalidateRequerySuggested();
         }
 
         protected override bool Validate()

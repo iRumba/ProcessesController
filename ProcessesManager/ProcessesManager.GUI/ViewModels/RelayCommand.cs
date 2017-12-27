@@ -9,8 +9,8 @@ namespace ProcessesManager.GUI.ViewModels
 {
     public class RelayCommand : ICommand
     {
-        private Action<object> execute;
-        private Func<object, bool> canExecute;
+        Action<object> _execute;
+        Func<object, bool> _canExecute;
 
         public event EventHandler CanExecuteChanged
         {
@@ -20,18 +20,18 @@ namespace ProcessesManager.GUI.ViewModels
 
         public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
         {
-            this.execute = execute;
-            this.canExecute = canExecute;
+            this._execute = execute;
+            this._canExecute = canExecute;
         }
 
         public bool CanExecute(object parameter)
         {
-            return canExecute == null || canExecute(parameter);
+            return _canExecute == null || _canExecute(parameter);
         }
 
         public void Execute(object parameter)
         {
-            execute(parameter);
+            _execute(parameter);
         }
     }
 }

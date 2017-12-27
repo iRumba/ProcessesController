@@ -19,8 +19,6 @@ namespace ProcessesManager.GUI.ViewModels
 
         public bool IsValid => Validate();
 
-        //public string ValidationDetails => ValidationDetails();
-
         protected ViewModel()
         {
             _values = new Dictionary<string, object>();
@@ -32,26 +30,6 @@ namespace ProcessesManager.GUI.ViewModels
                 if (dependencyAttr != null)
                     _dependencies[prop.Name] = dependencyAttr.DependentProperties;
             }
-        }
-
-        protected T GetValue<T>([CallerMemberName]string name = "")
-        {
-            if (string.IsNullOrEmpty(name))
-                return default(T);
-
-            if (GetValue(name, out var res))
-                return (T)res;
-            else
-                return default(T);
-        }
-
-        protected void SetValue(object value, [CallerMemberName]string name = "")
-        {
-            if (string.IsNullOrEmpty(name))
-                throw new InvalidOperationException("SetValue error");
-
-            if (!GetValue(name, out var current) || current != value)
-                UnsafeSetValue(name, value);
         }
 
         bool GetValue(string name, out object value)
@@ -77,6 +55,26 @@ namespace ProcessesManager.GUI.ViewModels
                     OnPropertyChanged(depName);
         }
 
+        protected T GetValue<T>([CallerMemberName]string name = "")
+        {
+            if (string.IsNullOrEmpty(name))
+                return default(T);
+
+            if (GetValue(name, out var res))
+                return (T)res;
+            else
+                return default(T);
+        }
+
+        protected void SetValue(object value, [CallerMemberName]string name = "")
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new InvalidOperationException("SetValue error");
+
+            if (!GetValue(name, out var current) || current != value)
+                UnsafeSetValue(name, value);
+        }
+
         protected void OnPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -92,20 +90,20 @@ namespace ProcessesManager.GUI.ViewModels
             return true;
         }
 
+        protected void ShowValidationDetailsMessage()
+        {
+            MessageBox.Show(ValidationDetailsString, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
         public string ValidationDetailsString
         {
             get
             {
                 var message = string.Empty;
-                foreach(var det in ValidationDetails)
+                foreach (var det in ValidationDetails)
                     message = $"{message}{det}\n";
                 return message;
             }
-        }
-
-        protected void ShowValidationDetailsMessage()
-        {
-            MessageBox.Show(ValidationDetailsString, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
