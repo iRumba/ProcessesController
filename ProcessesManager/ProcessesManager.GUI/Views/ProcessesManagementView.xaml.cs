@@ -31,5 +31,17 @@ namespace ProcessesManager.GUI.Views
         {
             InitializeComponent();
         }
+
+        private void thisWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!ViewModel.IsValid)
+            {
+                var message = string.Empty;
+                foreach (var det in ViewModel.ValidationDetails)
+                    message = $"{message}\n{det}";
+                MessageBox.Show(message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                e.Cancel = true;
+            }
+        }
     }
 }

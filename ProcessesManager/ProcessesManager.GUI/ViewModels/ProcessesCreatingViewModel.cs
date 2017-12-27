@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ProcessesManager.GUI.ViewModels
 {
@@ -16,12 +17,15 @@ namespace ProcessesManager.GUI.ViewModels
         public RelayCommand ImportCommand { get; }
         public RelayCommand ExportCommand { get; }
         public RelayCommand ClearCommand { get; }
+        public RelayCommand GenerateCommand { get; }
 
         public ObservableCollection<ProcessViewModel> Processes
         {
             get { return GetValue<ObservableCollection<ProcessViewModel>>(); }
             set { SetValue(value); }
         }
+
+        public ProcessesGeneratorViewModel Generator { get; } = new ProcessesGeneratorViewModel();
 
         public ProcessesCreatingViewModel()
         {
@@ -30,18 +34,25 @@ namespace ProcessesManager.GUI.ViewModels
             ExportCommand = new RelayCommand(Export, CanExport);
             ImportCommand = new RelayCommand(Import, CanExecuteTrue);
             ClearCommand = new RelayCommand(Clear, CanClear);
+            GenerateCommand = new RelayCommand(Generate, CanExecuteTrue);
         }
 
         void CreateProcess(object parameter)
         {
-            var counter = 0;
-            var name = $"Пр_{++counter}";
-            while (Processes.Any(p => p.Name == (name = $"Пр_{counter++}"))) { }
+            var name = ChangeName();
             var process = new ProcessViewModel { Prioritet = 1, Name = name };
             process.Stages.Add(new StageViewModel { Time = 1 });
             process.Stages.Add(new StageViewModel { Time = 1 });
             process.Stages.Add(new StageViewModel { Time = 1 });
             Processes.Add(process);
+        }
+
+        string ChangeName()
+        {
+            var counter = 0;
+            var name = $"Пр_{++counter}";
+            while (Processes.Any(p => p.Name == (name = $"Пр_{counter++}"))) { }
+            return name;
         }
 
         void RemoveProcess(object parameter)
@@ -57,35 +68,63 @@ namespace ProcessesManager.GUI.ViewModels
 
         void Export(object parameter)
         {
-            var dlg = new SaveFileDialog();
-            dlg.AddExtension = true;
-            dlg.DefaultExt = "txt";
-            dlg.Filter = "(Текстовые файлы)|*.txt";
-            dlg.OverwritePrompt = true;
-            var res = dlg.ShowDialog();
-            if (res.HasValue && res.Value)
+            try
             {
-                var fileName = dlg.FileName;
-                ProcessesFileLoader.ExportProcesses(Processes.ToList(), fileName);
+                var dlg = new SaveFileDialog();
+                dlg.AddExtension = true;
+                dlg.DefaultExt = "txt";
+                dlg.Filter = "(Текстовые файлы)|*.txt";
+                dlg.OverwritePrompt = true;
+                var res = dlg.ShowDialog();
+                if (res.HasValue && res.Value)
+                {
+                    var fileName = dlg.FileName;
+                    ProcessesFileLoader.ExportProcesses(Processes.ToList(), fileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                var message = "Попытка экспорта файл завершилась ошибкой:";
+                var currentEx = ex;
+                while (currentEx != null)
+                {
+                    message = $"{message}\n{ex.Message}";
+                    currentEx = ex.InnerException;
+                }
+                MessageBox.Show(message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         void Import(object parameter)
         {
-            var dlg = new OpenFileDialog();
-            dlg.AddExtension = true;
-            dlg.DefaultExt = "txt";
-            dlg.Filter = "(Текстовые файлы)|*.txt";
-            dlg.Multiselect = false;
-
-            var res = dlg.ShowDialog();
-            if (res.HasValue && res.Value)
+            try
             {
-                var fileName = dlg.FileName;
-                var processes = ProcessesFileLoader.ImportProcesses(fileName);
-                Processes.Clear();
-                foreach (var process in processes)
-                    Processes.Add(process);
+                var dlg = new OpenFileDialog();
+                dlg.AddExtension = true;
+                dlg.DefaultExt = "txt";
+                dlg.Filter = "(Текстовые файлы)|*.txt";
+                dlg.Multiselect = false;
+
+                var res = dlg.ShowDialog();
+                if (res.HasValue && res.Value)
+                {
+                    var fileName = dlg.FileName;
+                    var processes = ProcessesFileLoader.ImportProcesses(fileName);
+                    Processes.Clear();
+                    foreach (var process in processes)
+                        Processes.Add(process);
+                }
+            }
+            catch(Exception ex)
+            {
+                var message = "Попытка импорта файл завершилась ошибкой:";
+                var currentEx = ex;
+                while(currentEx != null)
+                {
+                    message = $"{message}\n{ex.Message}";
+                    currentEx = ex.InnerException;
+                }
+                MessageBox.Show(message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -102,6 +141,65 @@ namespace ProcessesManager.GUI.ViewModels
         bool AnyProcesses()
         {
             return Processes != null && Processes.Count > 0;
+        }
+
+        bool CanGenerate(object parameter)
+        {
+            return Generator.IsValid;
+        }
+
+        void Generate(object parameter)
+        {
+            if (!Generator.IsValid)
+            {
+                ShowValidationDetailsMessage();
+                return;
+            }
+            for (var i = 0; i < Generator.ProcessesCount; i++)
+            {
+                var process = new ProcessViewModel
+                {
+                    Name = ChangeName(),
+                    Prioritet = RandomHelper.Randomizer.Next(Generator.PriorityFrom, Generator.PriorityTo+1),
+                };
+
+                var stagesCount = RandomHelper.Randomizer.Next(Generator.StagesCountFrom, Generator.StagesCountTo+1);
+                var coercedStagesCount = stagesCount % 2 == 1 ? stagesCount : stagesCount - 1;
+                for (var j = 0; j < coercedStagesCount; j++)
+                {
+                    var stage = new StageViewModel
+                    {
+                        Time = RandomHelper.Randomizer.Next(Generator.StageTimeFrom, Generator.StageTimeTo+1),
+                    };
+                    process.Stages.Add(stage);
+                }
+                Processes.Add(process);
+            }
+        }
+
+        protected override bool Validate()
+        {
+            var res = true;
+            ValidationDetails.Clear();
+            for (var i = 0; i < Processes.Count; i++)
+            {
+                for (var j = i + 1; j < Processes.Count; j++)
+                {
+                    if (Processes[i].Name.ToLower() == Processes[j].Name.ToLower())
+                    {
+                        res = false;
+                        ValidationDetails.Add($"Имя процесса с индексом {i} совпадает с именем процесса с индексом {j}");
+                    }
+                }
+
+                if (!Processes[i].IsValid)
+                {
+                    res = false;
+                    foreach (var det in Processes[i].ValidationDetails)
+                        ValidationDetails.Add($"Процесс [{i}]{det}");
+                }
+            }
+            return res;
         }
     }
 }

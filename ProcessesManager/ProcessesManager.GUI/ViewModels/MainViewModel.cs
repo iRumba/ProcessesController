@@ -21,7 +21,7 @@ namespace ProcessesManager.GUI.ViewModels
         public MainViewModel()
         {
             NumberOfThreads = 2;
-            StartCommand = new RelayCommand(StartExecute, StartCanExecute);
+            StartCommand = new RelayCommand(StartExecute, CanExecuteTrue);
             OpenProcessesWindowCommand = new RelayCommand(OpenProcessesExecute, OpenProcessesCanExecute);
         }
 
@@ -97,8 +97,12 @@ namespace ProcessesManager.GUI.ViewModels
 
         async void StartExecute(object parameter)
         {
+            if (!IsValid)
+            {
+                ShowValidationDetailsMessage();
+                return;
+            }
             Processing = true;
-
             var manager = new Manager();
             var report = await manager.StartAsync(Processes.ToModel(), NumberOfThreads);
             Report = report;
@@ -117,6 +121,26 @@ namespace ProcessesManager.GUI.ViewModels
             wnd.ViewModel.Processes = Processes;
             wnd.ShowDialog();
             //CommandManager.InvalidateRequerySuggested();
+        }
+
+        protected override bool Validate()
+        {
+            var res = true;
+            ValidationDetails.Clear();
+
+            if (NumberOfThreads < 1)
+            {
+                res = false;
+                ValidationDetails.Add("Число количества потоков должно быть больше 0");
+            }
+
+            if (Processes.Count < 1)
+            {
+                res = false;
+                ValidationDetails.Add("число процессов должно быть больше 0");
+            }
+
+            return res;
         }
     }
 }

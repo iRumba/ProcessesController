@@ -8,7 +8,7 @@
         xmlns:conv="clr-namespace:ProcessesManager.GUI.Converters"
         mc:Ignorable="d"
         Name="thisWindow"
-        Title="Управление процессами" Height="400" Width="700">
+        Title="Управление процессами" Height="400" Width="700" Closing="thisWindow_Closing">
     <Window.Resources>
         <conv:ExistingToVisibilityConverter x:Key="ExistingToVisibilityConverter"/>
     </Window.Resources>
@@ -60,20 +60,20 @@
         </DockPanel>
         <!--Visibility="{Binding SelectedItem, ElementName=lstProcesses, Converter={StaticResource ExistingToVisibilityConverter}}"-->
         <DockPanel Grid.Row="1" Grid.Column="1" DataContext="{Binding SelectedItem, ElementName=lstProcesses}"
-                   
+                   Margin="5"
                    >
             <StackPanel DockPanel.Dock="Top">
                 <WrapPanel Orientation="Horizontal" Margin="5">
                     <Label>Имя:</Label>
-                    <TextBox Text="{Binding Name}" MaxLines="1" Width="70"/>
+                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" MaxLines="1" Width="70"/>
                 </WrapPanel>
                 <WrapPanel Orientation="Horizontal" Margin="5">
                     <Label>Приоритет:</Label>
-                    <TextBox Text="{Binding Prioritet}" MaxLines="1" Width="30"/>
+                    <TextBox Text="{Binding Prioritet, UpdateSourceTrigger=PropertyChanged}" MaxLines="1" Width="30"/>
                 </WrapPanel>
             </StackPanel>
 
-            <DockPanel Margin="5">
+            <DockPanel>
                 <WrapPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
                     <Button Margin="5" Padding="5" Command="{Binding AddStageCommand}">Добавить:</Button>
                 </WrapPanel>
@@ -82,7 +82,7 @@
                     <WrapPanel Orientation="Horizontal" DockPanel.Dock="Bottom" DataContext="{Binding SelectedItem, ElementName=lstStages}"
                                 Margin="5">
                         <Label>Время:</Label>
-                        <TextBox Text="{Binding Time}" Width="30"/>
+                        <TextBox Text="{Binding Time, UpdateSourceTrigger=PropertyChanged}" Width="30"/>
                     </WrapPanel>
                     <ListBox ItemsSource="{Binding Stages}" Name="lstStages" AlternationCount="2" HorizontalContentAlignment="Stretch">
                         <!--<ListBox.Resources>
@@ -100,18 +100,23 @@
                             <DataTemplate>
                                 <DockPanel>
                                     <Button Width="20" Height="20" VerticalAlignment="Center"
-                                            Command="{Binding DataContext.RemoveStageCommand, ElementName=lstStages}" CommandParameter="{Binding}">X</Button>
+                                            Command="{Binding DataContext.RemoveStageCommand, ElementName=lstStages}" CommandParameter="{Binding}"
+                                            DockPanel.Dock="Right">X</Button>
                                     <TextBlock>
                                     <Run>
                                         <Run.Style>
                                             <Style TargetType="Run">
                                                 <Style.Triggers>
-                                                    <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                                                    <DataTrigger 
+                                                        Binding="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ListBoxItem}}" 
+                                                        Value="0">
                                                         <Setter Property="Text" Value="CPU:"/>
-                                                    </Trigger>
-                                                    <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                                    </DataTrigger>
+                                                    <DataTrigger 
+                                                        Binding="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ListBoxItem}}"                                                         
+                                                        Value="1">
                                                         <Setter Property="Text" Value="HDD:"/>
-                                                    </Trigger>
+                                                    </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Run.Style>
@@ -125,6 +130,52 @@
                     </ListBox>
                 </DockPanel>
             </DockPanel>
+        </DockPanel>
+        <DockPanel Grid.Row="1" Grid.Column="2" Margin="5">
+            <WrapPanel DockPanel.Dock="Bottom">
+                <Button Margin="5" Padding="5" Command="{Binding GenerateCommand}">Генерировать</Button>
+            </WrapPanel>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="5" DataContext="{Binding Generator}">
+                <StackPanel>
+                    <WrapPanel Orientation="Horizontal">
+                        <Label>Количество процессов:</Label>
+                        <TextBox Width="30" Text="{Binding ProcessesCount}"/>
+                    </WrapPanel>
+                    <Label>Диапазон приоритетов:</Label>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="{Binding PriorityFrom}"/>
+                        <TextBlock Grid.Column="1">-</TextBlock>
+                        <TextBox Grid.Column="2" Text="{Binding PriorityTo}"/>
+                    </Grid>
+                    <Label>Диапазон количества этапов:</Label>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox  Text="{Binding StagesCountFrom}"/>
+                        <TextBlock Grid.Column="1">-</TextBlock>
+                        <TextBox Grid.Column="2"  Text="{Binding StagesCountTo}"/>
+                    </Grid>
+                    <Label>Диапазон времени этапов:</Label>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox  Text="{Binding StageTimeFrom}"/>
+                        <TextBlock Grid.Column="1">-</TextBlock>
+                        <TextBox Grid.Column="2" Text="{Binding StageTimeTo}"/>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
         </DockPanel>
     </Grid>
 </Window>

@@ -55,5 +55,35 @@ namespace ProcessesManager.GUI.ViewModels
             Stages.Add(new StageViewModel { Time = 1 });
             Stages.Add(new StageViewModel { Time = 1 });
         }
+
+        protected override bool Validate()
+        {
+            var res = true;
+            ValidationDetails.Clear();
+            if (Prioritet < 1)
+            {
+                res = false;
+                ValidationDetails.Add("Приоритет процесса должен быть больше 0");
+            }
+
+            if (Stages.Count < 3)
+            {
+                res = false;
+                ValidationDetails.Add("Количество этапов должно быть 3 или больше");
+            }
+
+            foreach(var stage in Stages)
+            {
+                if (!stage.IsValid)
+                {
+                    res = false;
+                    foreach (var det in stage.ValidationDetails)
+                        ValidationDetails.Add($"Стадия[{Stages.IndexOf(stage)}]: {det}");
+                }
+
+            }
+
+            return res;
+        }
     }
 }

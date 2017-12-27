@@ -22,5 +22,19 @@ namespace ProcessesManager.GUI.ViewModels
                 SetValue(value);
             }
         }
+
+        protected override bool Validate()
+        {
+            var res = true;
+            ValidationDetails.Clear();
+
+            if (Time < 1)
+            {
+                res = false;
+                ValidationDetails.Add("Время этапа должно быть больше 0");
+            }
+
+            return res;
+        }
     }
 }

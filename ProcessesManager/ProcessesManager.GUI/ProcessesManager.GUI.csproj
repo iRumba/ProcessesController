@@ -58,6 +58,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Classes\ProcessesFileLoader.cs" />
+    <Compile Include="Classes\RandomHelper.cs" />
     <Compile Include="Converters\ExistingToVisibilityConverter.cs" />
     <Compile Include="DataGridProcessContainerColumn.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

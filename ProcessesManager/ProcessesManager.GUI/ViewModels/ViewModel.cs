@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace ProcessesManager.GUI.ViewModels
@@ -15,7 +17,13 @@ namespace ProcessesManager.GUI.ViewModels
         Dictionary<string, object> _values;
         Dictionary<string, string[]> _dependencies;
 
+        public ObservableCollection<string> ValidationDetails { get; } = new ObservableCollection<string>();
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool IsValid => Validate();
+
+        //public string ValidationDetails => ValidationDetails();
 
         protected ViewModel()
         {
@@ -81,6 +89,27 @@ namespace ProcessesManager.GUI.ViewModels
         protected bool CanExecuteTrue(object parameter)
         {
             return true;
+        }
+
+        protected virtual bool Validate()
+        {
+            return true;
+        }
+
+        public string ValidationDetailsString
+        {
+            get
+            {
+                var message = string.Empty;
+                foreach(var det in ValidationDetails)
+                    message = $"{message}{det}\n";
+                return message;
+            }
+        }
+
+        protected void ShowValidationDetailsMessage()
+        {
+            MessageBox.Show(ValidationDetailsString, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

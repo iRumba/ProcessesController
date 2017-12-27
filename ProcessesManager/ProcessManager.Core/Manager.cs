@@ -25,7 +25,7 @@ namespace ProcessManager.Core
             var hdd = new List<Process>();
             var inWork = hdd.Concat(threads).Where(p => p != null);
             var completed = new List<Process>();
-            var counter = 0;
+            var counter = -1;
             res.AddRow(counter, waitings.ToReport(), threads.ToReport(), hdd.ToReport());
             while (allCount > completed.Count)
             {
